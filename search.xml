@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>Mysql调优</title>
+      <link href="/2021/10/24/mysql-you-hua/"/>
+      <url>/2021/10/24/mysql-you-hua/</url>
+      
+        <content type="html"><![CDATA[<h1 id="MySQL优化"><a href="#MySQL优化" class="headerlink" title="MySQL优化"></a>MySQL优化</h1><hr><h2 id="存储引擎选择"><a href="#存储引擎选择" class="headerlink" title="存储引擎选择"></a>存储引擎选择</h2><hr><ol><li>InnoDB<ul><li>优点<ul><li>支持事务</li><li>支持行级锁，提交了并发</li></ul></li><li>缺点<ul><li>不擅长快速插入（插入前需要排序）和检索，消耗时间</li></ul></li></ul></li><li>MyISAM<ul><li>优点<ul><li>高速查询及插入</li></ul></li></ul></li><li>选择<ul><li>Innodb ：数据完整性，并发性处理，擅长更新，删除。</li><li>myisam：高速查询及插入。擅长插入和查询。</li></ul></li></ol><h2 id="字段类型"><a href="#字段类型" class="headerlink" title="字段类型"></a>字段类型</h2><hr><p>尽可能小、尽可能定长、尽可能使用整数</p><h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><hr><ul><li><p>对经常使用的列创建索引，一个表的索引尽量不要超过6个</p><ul><li><pre class=" language-mysql"><code class="language-mysql">主键索引ALTER  TABLE  `table_name`  ADD  PRIMARY  KEY (  `column`  ) 唯一索引ALTER  TABLE  `table_name`  ADD  UNIQUE (`column` ) 普通索引ALTER  TABLE  `table_name`  ADD  INDEX index_name (  `column`  )全文索引ALTER  TABLE  `table_name`  ADD  FULLTEXT ( `column` )</code></pre></li></ul></li><li><p>如何选择索引列：</p><ol><li>where 经常使用的列</li><li>SQL语句中频繁使用表连接的关键字</li><li>不要把频繁更改的列作为索引列</li></ol></li><li><p>主键索引不能为空值，唯一索引允许空值；主键索引在一张表内只能创建一个，唯一索引可以创建多个。主键索引肯定是唯一索引，但唯一索引不一定是主键索引。</p></li></ul><h2 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h2><hr><p>开启查询缓存（query_cache_size和query_cache_type）</p><pre class=" language-mysql"><code class="language-mysql">开启查询缓存set global query_cache_type = 1；设置查询缓存大小set global query_cache_size = 1024 * 1024 *32查询查询缓存是否开启show variables like ‘query_cache%’</code></pre><h2 id="分区分表"><a href="#分区分表" class="headerlink" title="分区分表"></a>分区分表</h2><hr><ol><li>对很大的表进行拆分<ol><li>将常用字段作为一个表，其他字段存到另一个表，使用id关联</li><li>每多少条数据就拆分成一个表</li></ol></li></ol><h2 id="数据库集群部署"><a href="#数据库集群部署" class="headerlink" title="数据库集群部署"></a>数据库集群部署</h2><hr><ol><li>主从复制</li><li>读写分离，负载均衡<ul><li>务器安装了mysql proxy或Ameoba软件就可以实现读写分离和负载均衡</li></ul></li></ol><h2 id="SQL优化"><a href="#SQL优化" class="headerlink" title="SQL优化"></a>SQL优化</h2><hr><ol><li>少用多表操作，将复杂SQL拆分成多次执行，增加查询缓存利用率</li><li>like匹配时不要再头部使用通配符</li><li>不要对索引列进行表达式操作</li><li>避免使用select *</li><li>多表联查要使用小表作为驱动表</li></ol><h2 id="定位慢SQL"><a href="#定位慢SQL" class="headerlink" title="定位慢SQL"></a>定位慢SQL</h2><hr><p>定位执行较慢的查询语句方案</p><pre class=" language-mysql"><code class="language-mysql">开启慢查询日志set global slow_query_log=1; 设置临界时间set long_query_time=0.5；</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 数据库 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> SQL </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>MySQL主从复制读写分离</title>
+      <link href="/2021/10/24/mysql-zhu-cong-fu-zhi-du-xie-fen-chi/"/>
+      <url>/2021/10/24/mysql-zhu-cong-fu-zhi-du-xie-fen-chi/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>MySQL事务实现</title>
+      <link href="/2021/10/24/mysql-shi-wu/"/>
+      <url>/2021/10/24/mysql-shi-wu/</url>
+      
+        <content type="html"><![CDATA[<h1 id="MySQL事务特性"><a href="#MySQL事务特性" class="headerlink" title="MySQL事务特性"></a>MySQL事务特性</h1><hr><h2 id="四大特性ACID："><a href="#四大特性ACID：" class="headerlink" title="四大特性ACID："></a>四大特性ACID：</h2><hr><ol><li>原子性<ul><li>一个事务内的所有操作要么全都执行，要么全都不执行</li></ul></li><li>一致性<ul><li>事务执行之后，数据行的完整性约束不被破坏，主要体现在数据库主键唯一、字段类型大小符合要求，外键约束符合要求</li></ul></li><li>隔离性<ul><li>数据库允许多个并发事务同时对数据进行读写和修改，隔离性可以防止多个事务交叉执行而导致数据不一致。隔离级别分为：读未提交、读已提交、可重复度、可串行化</li></ul></li><li>持久性<ul><li>事务执行之后，对数据库的修改是永久性的，即使系统故障也不会丢失。</li></ul></li></ol><h2 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h2><hr><ul><li><p>原子性</p><ul><li><pre class=" language-markdown"><code class="language-markdown">通过Undo log日志。每次执行SQL语句都会记录到Undo log日志当中，当发生回滚时，根据记录生成逆向SQL执行，实现回滚</code></pre></li></ul></li><li><p>持久性</p><ul><li><pre class=" language-markdown"><code class="language-markdown">通过redo log。InnoDB存储引擎为了提交读写效率，提供了一个buffer缓存，每次读取数据都会在buffer中查询数据是否存在，存在就直接读取，不存在就在磁盘中读取，再放入buffer中。写入数据也是先写入到buffer中，然后定期刷新到磁盘上，如果写入buffer还没刷新到磁盘中MySQL宕机就会导致数据丢失，这时候引入redo log解决这问题。redo log是预写式日志，每次执行修改操作都会先写入到redo log日志，再更新到buffer中，这样保证持久性。redo log持久化会比buffer持久化更快的原因：buffer持久化是随机IO进行写入，而redo log是在文件尾部追加，属于顺序IO的方式。buffer持久化以page为单位，MySQL默认page页大小是16K，这个page有一处修改就需要将整个page写入，而redo log只需要更改需要的部分就可以，较少了无效IO操作redo log持久化机制<span class="token code keyword">    0：提交事务时，不将redo log缓冲区的文件写入到磁盘日志文件，而是等待主线程每秒刷新</span><span class="token code keyword">    1：事务提交时将缓冲区的redo log同步写入磁盘，保证一定会写入成功，正常就是使用这个模式</span><span class="token code keyword">    2：事务提交时将缓冲区的redo log日志异步写入磁盘，不能完全保证commit时肯定会写入到redo             log日志文件</span></code></pre></li></ul></li><li><p>隔离性</p><ul><li><pre class=" language-markdown"><code class="language-markdown">写-写操作：通过锁实现（表锁，行锁，间隙锁）保证只有一个事务执行操作写-读操作：MVCC实现</code></pre></li></ul></li><li><p>一致性</p></li></ul><h2 id="MySQL隔离级别"><a href="#MySQL隔离级别" class="headerlink" title="MySQL隔离级别"></a>MySQL隔离级别</h2><hr><table><thead><tr><th align="center">隔离级别</th><th align="center">脏读</th><th align="center">不可重复读</th><th align="center">幻读</th></tr></thead><tbody><tr><td align="center">读未提交</td><td align="center">√</td><td align="center">√</td><td align="center">√</td></tr><tr><td align="center">读已提交</td><td align="center">×</td><td align="center">√</td><td align="center">√</td></tr><tr><td align="center">可重复读</td><td align="center">×</td><td align="center">×</td><td align="center">√</td></tr><tr><td align="center">可串行化</td><td align="center">×</td><td align="center">×</td><td align="center">×</td></tr></tbody></table>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Spring</title>
+      <link href="/2021/08/19/spring/"/>
+      <url>/2021/08/19/spring/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> Spring框架 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Spring </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>多线程</title>
+      <link href="/2021/08/18/duo-xian-cheng/"/>
+      <url>/2021/08/18/duo-xian-cheng/</url>
+      
+        <content type="html"><![CDATA[<h2 id="进程和线程"><a href="#进程和线程" class="headerlink" title="进程和线程"></a>进程和线程</h2><p>进程是系统运行程序的最小单位，线程是程序执行的最小单位。</p><p>一个main方法有五个进程：</p><ul><li>添加时间进程 Attach Listener</li><li>分发处理给jvm信号的进程 Signal Dispatcher</li><li>调用方法的进程 Finalizer</li><li>清除线程  Reserence Handler</li><li>main线程 程序入口</li></ul><h2 id="进程与线程的区别："><a href="#进程与线程的区别：" class="headerlink" title="进程与线程的区别："></a>进程与线程的区别：</h2><ul><li>一个进程可以有多个线程，线程共享进程的堆和方法区（堆存储创建的所有对象，方法区存储加载的类信息、常量等）</li><li>进程之间互相独立，进程则不一定</li><li>每个线程有自己独立的栈（虚拟机栈和本地方法栈）和程序计数器<ul><li>程序计数器私有是为了线程切换后能够回到之前执行的位置</li><li>栈私有是为了保证线程中的局部变量不被其他线程访问</li></ul></li><li>线程执行开销小，不容易以资源管理和保护，进程相反</li></ul><h2 id="并发和并行"><a href="#并发和并行" class="headerlink" title="并发和并行"></a>并发和并行</h2><ol><li>并发：同一时间段，多个任务都在执行</li><li>并行：单位时间内，多个任务同时执行</li></ol><h2 id="线程的生命周期"><a href="#线程的生命周期" class="headerlink" title="线程的生命周期"></a>线程的生命周期</h2><ol><li>NEW  新建状态（没有调用start方法）</li><li>RUNNABLE 运行状态（新建线程后执行start方法，进入就绪状态，分配到cpu资源后进入运行状态，因为就绪状态时间很短，所以java不区分，统称运行状态）</li><li>BLOCKED 阻塞状态 （线程没有获取到锁的时候进入到阻塞状态）</li><li>WAITING  等待状态（进入等待状态需要其他线程的通知才能恢复到运行状态）</li><li>TIME_WAITING 超时等待状态（线程执行sleep（long millis)或者wait(long millis)方法，进入超时等待状态，时间到了后恢复到运行状态）</li><li>TERMINATED 终止状态（线程执行完RUNNABLE内的run方法后，进入到终止状态）</li></ol><h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><p>多个线程同时被阻塞，都在等待某一个资源被释放</p><h4 id="死锁必备四个条件："><a href="#死锁必备四个条件：" class="headerlink" title="死锁必备四个条件："></a>死锁必备四个条件：</h4><ul><li>互斥条件：该资源任意时刻只能被一个线程持有</li><li>请求与保持条件：一个进程因为请求资源而阻塞时，不释放已持有的资源</li><li>不剥夺条件：线程已获得的资源不能被其他线程剥夺，只能自己使用完毕后释放</li><li>循环等待条件：多个线程之间行成头尾相接的循环等待资源关系</li></ul><h4 id="避免死锁和破坏死锁"><a href="#避免死锁和破坏死锁" class="headerlink" title="避免死锁和破坏死锁"></a>避免死锁和破坏死锁</h4><ol><li>避免死锁：<ul><li>资源分配时借助算法对资源分配进行评估</li></ul></li><li>破坏死锁：<ul><li>破坏请求与保持条件：一次性申请所有资源</li><li>破坏不剥夺条件：占用资源的进程进一步申请资源申请不到时，主动释放已获取的资源</li><li>破坏循环等待条件：按照顺序申请资源，释放资源则反序释放</li></ul></li></ol><h2 id="sleep-方法和wait-方法的区别和共同点"><a href="#sleep-方法和wait-方法的区别和共同点" class="headerlink" title="sleep()方法和wait()方法的区别和共同点"></a>sleep()方法和wait()方法的区别和共同点</h2><ul><li>区别：sleep方法不会释放锁，wait方法释放锁</li><li>相同：都会暂停线程执行<ul><li>wait常用与线程之间通信，sleep常用户暂停执行</li><li>wait执行后不会自动苏醒，需要其他线程调用同一对象的notify方法或者notifyall方法。sleep方法执行完成后，会自动唤醒，或者可以使用wait（long timeout）超时后线程自动苏醒</li></ul></li></ul><h2 id="为什么调用start方法时会执行run方法，而不能直接执行run方法"><a href="#为什么调用start方法时会执行run方法，而不能直接执行run方法" class="headerlink" title="为什么调用start方法时会执行run方法，而不能直接执行run方法"></a>为什么调用start方法时会执行run方法，而不能直接执行run方法</h2><ul><li>新建一个线程后，调用start方法，线程进入就绪状态之后分配到cpu资源后就可以开始运行，start会执行线程的准备工作，然后自动执行run方法的内容，这是真正的多线程工作。而直接运行run方法，main线程会将run方法当成普通方法执行，不是多线程工作。</li></ul><h2 id="创建线程的方式"><a href="#创建线程的方式" class="headerlink" title="创建线程的方式"></a>创建线程的方式</h2><ol><li>继承thread类<ul><li>优点：代码简单</li><li>缺点：无法集成别的类</li></ul></li><li>实现RUNNABLE接口<ul><li>优点：可以继承其他类，同一实现该接口的实例可以共享资源</li><li>缺点：代码复杂</li></ul></li><li>实现Callable接口<ul><li>优点：可以获得异步任务的返回值</li></ul></li><li>线程池方式<ul><li>优点：自动化装配，易于管理，循环利用资源</li></ul></li></ol><h2 id="创建线程池的几种方式"><a href="#创建线程池的几种方式" class="headerlink" title="创建线程池的几种方式"></a>创建线程池的几种方式</h2><ol><li>使用Executor工厂创建<ul><li>newFixedThreadPool  创建一个固定长度的线程池，每提交一个任务就创建一个线程，当线程数达到最大数量，超出的会在队列中等待</li><li>newCacheThreadPool 创建一个可缓存的线程池，规模不受限制，当规模超出了任务数量自动回收，增加任务会自动添加线程</li><li>newSingleThreadPool 创建一个单线程化的线程池，它只会使用唯一的工作的线程来处理任务，保证所有任务根据指定顺序（FIFO，LIFO，优先级执行）</li><li>newScheduledThreadPool 创建一个固定长度的线程池，支持定时和周期性执行任务</li></ul></li></ol><h2 id="悲观锁和乐观锁"><a href="#悲观锁和乐观锁" class="headerlink" title="悲观锁和乐观锁"></a>悲观锁和乐观锁</h2><h4 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h4><ol><li>悲观锁：认为操作数据时，其他人也会同事修改数据，因此操作时直接将数据锁住，操作完成后再释放，上锁旗舰其他人会阻塞。Java中synchronized和ReentrantLock等独占锁就是悲观锁思想的实现</li><li>乐观锁：操作数据时认为别人不会修改数据，不会上锁，当操作完成执行更新时才会检查是否有人修改了数据，如果有人修改则放弃操作，否则执行更新</li></ol><h4 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h4><ul><li><p>乐观锁</p><ul><li><p>CAS方式（Compare And Swap）：CAS包含三个操作数，1️⃣需要读写的内存位置（V）2️⃣进行比较的预期值（A）3️⃣拟写入的新值（B）</p><p>操作逻辑：如果内存位置V的值等于预期的A值，则将该位置更新为新值B，否则不进行任何操作。许多CAS的操作是自旋的：如果操作不成功，会一直重试，直到操作成功为止。</p><p>CAS包含比较和交换两个操作，如何保证原子性：CAS是由CPU支持的原子操作，其原子性是在硬件层面进行保证的。</p><pre class=" language-java"><code class="language-java">在下面的代码示例中：value1没有进行任何线程安全方面的保护，value2使用了乐观锁<span class="token punctuation">(</span>CAS<span class="token punctuation">)</span>，value3使用了悲观锁<span class="token punctuation">(</span><span class="token keyword">synchronized</span><span class="token punctuation">)</span>。运行程序，使用<span class="token number">1000</span>个线程同时对value1、value2和value3进行自增操作，可以发现：value2和value3的值总是等于<span class="token number">1000</span>，而value1的值常常小于<span class="token number">1000</span>。<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>         <span class="token comment" spellcheck="true">//value1：线程不安全</span>    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">int</span> value1 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//value2：使用乐观锁</span>    <span class="token keyword">private</span> <span class="token keyword">static</span> AtomicInteger value2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AtomicInteger</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//value3：使用悲观锁</span>    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">int</span> value3 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">synchronized</span> <span class="token keyword">void</span> <span class="token function">increaseValue3</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>        value3<span class="token operator">++</span><span class="token punctuation">;</span>    <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>         <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">//开启1000个线程，并执行自增操作</span>        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">1000</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span><span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>            <span class="token keyword">new</span> <span class="token class-name">Thread</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Runnable</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>                <span class="token annotation punctuation">@Override</span>                <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>                    <span class="token keyword">try</span> <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>                        Thread<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                    <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span> <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>                        e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                    <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>                    value1<span class="token operator">++</span><span class="token punctuation">;</span>                    value2<span class="token punctuation">.</span><span class="token function">getAndIncrement</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                    <span class="token function">increaseValue3</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>            <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">//打印结果</span>        Thread<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"线程不安全："</span> <span class="token operator">+</span> value1<span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"乐观锁(AtomicInteger)："</span> <span class="token operator">+</span> value2<span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"悲观锁(synchronized)："</span> <span class="token operator">+</span> value3<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span><span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span></code></pre></li><li><p>版本号方式：在数据库中新增一个字段version表示该数据的版本号，每当数据修改时，版本号+1，当某个线程查询数据时，将该数据的版本号一起查出来，当更新该数据时，判断当前版本号是否和之前读取的版本号一致，如果一致才进行操作。</p><p>假设数据库中帐户信息表中有一个 version 字段，当前值为 1 ；而当前帐户余额字段（ balance ）为 $100 。</p><p>操作员 A 此时将其读出（ version=1 ），并从其帐户余额中扣除 $50（ $100-$50 ）。<br>在操作员 A 操作的过程中，操作员B 也读入此用户信息（ version=1 ），并从其帐户余额中扣除 $20 （ $100-$20 ）。<br>操作员 A 完成了修改工作，将数据版本号加一（ version=2 ），连同帐户扣除后余额（ balance=$50 ），提交至数据库更新，此时由于提交数据版本大于数据库记录当前版本，数据被更新，数据库记录 version 更新为 2 。<br>操作员 B 完成了操作，也将版本号加一（ version=2 ）试图向数据库提交数据（ balance=$80 ），但此时比对数据库记录版本时发现，操作员 B 提交的数据版本号为 2 ，数据库记录当前版本也为 2 ，不满足 “ 当前最后更新的version与操作员第一次的版本号相等 “ 的乐观锁策略，因此，操作员 B 的提交被驳回。<br>这样，就避免了操作员 B 用基于 version=1 的旧数据修改的结果覆盖操作员A 的操作结果的可能。</p></li></ul><h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h4><ul><li>乐观锁主要用在读多写少的场景，即冲很少的时候，可以省去锁的开销</li><li>悲观锁主要用多写的场景</li></ul><h4 id="乐观锁加锁吗？"><a href="#乐观锁加锁吗？" class="headerlink" title="乐观锁加锁吗？"></a>乐观锁加锁吗？</h4><p>​    乐观锁不加锁，只是在更新时判断一下数据是否被更新了，如AtomicInteger</p><p>​    乐观锁可以和加锁操作结合，比如在sql中使用for update加锁，但是不能改变乐观锁不加锁的事实</p></li></ul><h4 id="CAS缺点"><a href="#CAS缺点" class="headerlink" title="CAS缺点"></a>CAS缺点</h4><ul><li><p>ABA问题：</p><p>假设有两个线程——线程1和线程2，两个线程按照顺序进行以下操作：</p><p>(1)线程1读取内存中数据为A；</p><p>(2)线程2将该数据修改为B；</p><p>(3)线程2将该数据修改为A；</p><p>(4)线程1对数据进行CAS操作</p><p>在第(4)步中，由于内存中数据仍然为A，因此CAS操作成功，但实际上该数据已经被线程2修改过了。这就是ABA问题。</p><p>在AtomicInteger的例子中，ABA似乎没有什么危害。但是在某些场景下，ABA却会带来隐患，例如栈顶问题：一个栈的栈顶经过两次(或多次)变化又恢复了原值，但是栈可能已发生了变化。</p><p>对于ABA问题，比较有效的方案是引入版本号，内存中的值每发生一次变化，版本号都+1；在进行CAS操作时，不仅比较内存中的值，也会比较版本号，只有当二者都没有变化时，CAS才能执行成功。Java中的AtomicStampedReference类便是使用版本号来解决ABA问题的。</p></li><li><p>高竞争下的开销问题</p><p>在高并发情况加，如果CAS一直失败，会不断进行重试，cpu开销大，这种情况可以引入退出机制，即当重试次数超过一定阈值后失败退出。最好的办法是在高竞争条件下避免使用乐观锁</p></li><li><p>CAS功能限制</p><p>涉及到多个变量，CAS无法处理</p><p>CAS依赖硬件层面，用户不能直接调用，只能依赖java下的atomic下的原子类使用，灵活性受到限制</p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 线程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 多线程 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>mysql函数</title>
+      <link href="/2021/08/13/mysql-han-shu/"/>
+      <url>/2021/08/13/mysql-han-shu/</url>
+      
+        <content type="html"><![CDATA[<h2 id="Mysql的四大排序函数"><a href="#Mysql的四大排序函数" class="headerlink" title="Mysql的四大排序函数"></a>Mysql的四大排序函数</h2><ol><li><p>Row_number( )</p><p>查询出来结果添加序号（number字段，它是连续的）</p><pre class=" language-mysql"><code class="language-mysql">select row_number() over(order by Score) as "number",* from Scores;</code></pre><p><a href="https://imgtu.com/i/fDcbGQ"><img src="https://z3.ax1x.com/2021/08/13/fDcbGQ.png" alt="fDcbGQ.png"></a></p></li><li><p>rank（）</p><p>与row_number不同的是，rank中排序的结果中相同的成绩的序号（number）是相同的，序号之间不连续</p><pre class=" language-mysql"><code class="language-mysql">select *,rank() over(order by score desc) as "number" from Scores;</code></pre><p><a href="https://imgtu.com/i/fDgwWQ"><img src="https://z3.ax1x.com/2021/08/13/fDgwWQ.png" alt="fDgwWQ.png"></a></p></li><li><p>dense_rank()</p><p>与row_number不同的是，rank中排序的结果中相同的成绩的序号（number）是相同的，序号之间连续</p><pre class=" language-mysql"><code class="language-mysql">select *,dense_rank() over(order by score desc) as "number" from Scores;</code></pre><p><a href="https://imgtu.com/i/fD2s9e"><img src="https://z3.ax1x.com/2021/08/13/fD2s9e.png" alt="fD2s9e.png"></a></p></li><li><p>ntile()</p><p>NTILE()函数是将有序分区中的行分发到指定数目的组中，各个组有编号，编号从1开始，就像我们说的’分区’一样 ，分为几个区，一个区会有多少个。</p><p>分组依据：总条数/桶数==0  平均分配</p><p>​                    总条数/桶数！=0   则先拿出总条数/桶数+1个分为第一个分区，剩余条数/桶数-1 ==0 平均分配 若不为0，则再拿出总条数/桶数+1个分为第二个分区，循环下去，直至平均分配</p><pre class=" language-mysql"><code class="language-mysql">select *, ntile(3) over(order by score desc) as "number" from Scores</code></pre><p>![image-20210813141932991](/Users/qnyx/Library/Application Support/typora-user-images/image-20210813141932991.png)</p></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 数据库 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> SQL </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>集合</title>
+      <link href="/2021/06/29/ji-he/"/>
+      <url>/2021/06/29/ji-he/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Java集合常见问题"><a href="#Java集合常见问题" class="headerlink" title="Java集合常见问题"></a>Java集合常见问题</h1><ol><li><h2 id="List、Set、Map区别"><a href="#List、Set、Map区别" class="headerlink" title="List、Set、Map区别"></a>List、Set、Map区别</h2><ul><li>List：存储的数据有序、可重复</li><li>Set：存储的数据无序、不可重复</li><li>Map：使用键值对（key-value存储），key是无序的、不可重复，value是无序的、可重复的</li></ul></li><li><h2 id="集合的底层数据结构"><a href="#集合的底层数据结构" class="headerlink" title="集合的底层数据结构"></a>集合的底层数据结构</h2><ol><li>List集合<ul><li>ArrayList：<code>Object[]</code>数组</li><li>Vector：<code>Object[]</code>数组</li><li>LinkedList：双向链表实现（jdk1.6之前是循环链表）</li></ul></li><li>Set集合<ul><li>HashSet：基于HashMap实现，底层使用HashMap存储数据</li><li>LinkedHashSet：是HashSet的子类，基于LinkedHashMap实现的</li><li>TreeSet（有序、唯一）：红黑树（自平衡的排序二叉树）</li></ul></li><li>Map集合<ul><li>HashMap：底层使用数组+链表实现，数组是HashMap的主体</li></ul></li></ol></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> Java基础 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 集合 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Mysql调优</title>
+      <link href="/2021/06/09/mysql-diao-you/"/>
+      <url>/2021/06/09/mysql-diao-you/</url>
+      
+        <content type="html"><![CDATA[<h2 id="Sql调优的几种方式"><a href="#Sql调优的几种方式" class="headerlink" title="Sql调优的几种方式"></a>Sql调优的几种方式</h2><ol><li><h5 id="在表中建立索引-优先选择where-、group-by使用到的字段"><a href="#在表中建立索引-优先选择where-、group-by使用到的字段" class="headerlink" title="在表中建立索引,优先选择where 、group by使用到的字段"></a>在表中建立索引,优先选择where 、group by使用到的字段</h5><ul><li>在经常需要进行检索的字段上创建索引。</li><li>一个表的索引数最好不要超过6个。索引可以提高响应的select速度，但降低了insert和update的效率，因为insert和update时有可能会重建索引，创建索引需要慎重考虑，视具体情况而定</li></ul></li><li><h5 id="尽量避免使用select-，返回无用的字段会降低查询效率。"><a href="#尽量避免使用select-，返回无用的字段会降低查询效率。" class="headerlink" title="尽量避免使用select * ，返回无用的字段会降低查询效率。"></a>尽量避免使用select * ，返回无用的字段会降低查询效率。</h5><p>如：<code>select * from table</code></p><p>优化方式：使用具体的字段代替*，只返回有用的字段。如：<code>select name ,age from table</code></p></li><li><h5 id="尽量避免使用in和-not-in，会导致索引失效从而进行全表扫描。"><a href="#尽量避免使用in和-not-in，会导致索引失效从而进行全表扫描。" class="headerlink" title="尽量避免使用in和 not in，会导致索引失效从而进行全表扫描。"></a>尽量避免使用in和 not in，会导致索引失效从而进行全表扫描。</h5><p>如：<code>select * from table where id in (1,2)）</code></p><p>​        <code>select * from table where username in (select username form table2)</code></p><p>优化方式：如果是连续数值，可以使用between代替。如下：</p><p>​        <code>select * from table where id between1 and 2</code></p><p>如果是子查询，可以使用exists代替。如下：</p><p>​        <code>select * from table where exists(select * from table2     where table.username = table2.username)</code></p></li><li><h5 id="应尽量避免使用or，会导致数据库引擎放弃索引进行全表扫描。"><a href="#应尽量避免使用or，会导致数据库引擎放弃索引进行全表扫描。" class="headerlink" title="应尽量避免使用or，会导致数据库引擎放弃索引进行全表扫描。"></a>应尽量避免使用or，会导致数据库引擎放弃索引进行全表扫描。</h5><p>如：<code>select * from table where id = 3 or id =1</code></p><p>优化方式：<code>select * from table where id = 1 union select * from table id = 3</code></p></li><li><h5 id="尽量避免在字段开头进行模糊查询，会导致数据库引擎放弃索引进行全表扫描"><a href="#尽量避免在字段开头进行模糊查询，会导致数据库引擎放弃索引进行全表扫描" class="headerlink" title="尽量避免在字段开头进行模糊查询，会导致数据库引擎放弃索引进行全表扫描"></a>尽量避免在字段开头进行模糊查询，会导致数据库引擎放弃索引进行全表扫描</h5><p>如：<code>select * from table where username like &#39;%li%&#39;</code></p><p>优化方式：尽量在字段后面使用模糊查询，如下：</p><p>​        <code>select* from table where username like &#39;li%&#39;</code></p></li><li><h5 id="尽量避免进行null值的判断，会导致数据库引擎放弃索引进行全表扫描。"><a href="#尽量避免进行null值的判断，会导致数据库引擎放弃索引进行全表扫描。" class="headerlink" title="尽量避免进行null值的判断，会导致数据库引擎放弃索引进行全表扫描。"></a>尽量避免进行null值的判断，会导致数据库引擎放弃索引进行全表扫描。</h5><p>如：<code>select * from table where score is null</code> </p><p>优化方式：给自担添加默认值0，对0值进行判断。</p><p>​        <code>select * from table where score =0</code></p></li><li><h5 id="避免在where条件中对索引列（-左边的）进行表达式、函数操作，会导致数据库放弃索引进行全表扫描"><a href="#避免在where条件中对索引列（-左边的）进行表达式、函数操作，会导致数据库放弃索引进行全表扫描" class="headerlink" title="避免在where条件中对索引列（=左边的）进行表达式、函数操作，会导致数据库放弃索引进行全表扫描"></a>避免在where条件中对索引列（=左边的）进行表达式、函数操作，会导致数据库放弃索引进行全表扫描</h5><p>如下：</p><p>​        <code>select * from table where id / 10  = 2</code></p><p>​        <code>select * from table where substr(username ,1 , 2) = &#39;li&#39;</code></p><p>优化方式：将表达式、函数操作移动到等号右侧，如下：</p><p>​        <code>select * from table where id = 10 * 2</code></p><p>​        <code>select * from table where username like &#39;li%&#39;</code></p></li><li><h5 id="数据量大时，避免使用where-1-1-条件。通常为了方便拼装查询条件，我们会默认使用该条件，数据库引擎会放弃索引进行全表扫描。"><a href="#数据量大时，避免使用where-1-1-条件。通常为了方便拼装查询条件，我们会默认使用该条件，数据库引擎会放弃索引进行全表扫描。" class="headerlink" title="数据量大时，避免使用where 1 = 1 条件。通常为了方便拼装查询条件，我们会默认使用该条件，数据库引擎会放弃索引进行全表扫描。"></a>数据量大时，避免使用where 1 = 1 条件。通常为了方便拼装查询条件，我们会默认使用该条件，数据库引擎会放弃索引进行全表扫描。</h5><p>如下：<code>select * form table where 1 = 1</code></p><p>优化方式：用代码拼装sql时进行判断，没where加where，有where加and。</p></li><li><p>尽量将多条sql语句压缩到一条sql中</p></li><li><h5 id="用where替代having"><a href="#用where替代having" class="headerlink" title="用where替代having"></a>用where替代having</h5><ul><li>避免使用having，因为having是在检索出所有记录后对结果集进行筛选，而where是在聚合前筛选记录。</li><li>如功能通过where限制记录的数目，就能减少开销</li></ul></li><li><h5 id="使用表的别名"><a href="#使用表的别名" class="headerlink" title="使用表的别名"></a>使用表的别名</h5><ul><li>当连接多个表时，使用表的别名并且把别名前缀与每个列名上，减少解析时间</li></ul></li><li><h5 id="用varchar、nvarchar代替char、nchar"><a href="#用varchar、nvarchar代替char、nchar" class="headerlink" title="用varchar、nvarchar代替char、nchar"></a>用varchar、nvarchar代替char、nchar</h5></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 数据库 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> SQL </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Redis常见面试题</title>
+      <link href="/2021/06/09/redis/"/>
+      <url>/2021/06/09/redis/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Redis常见面试题"><a href="#Redis常见面试题" class="headerlink" title="Redis常见面试题"></a>Redis常见面试题</h1><ol><li><h4 id="为什么要用-Redis-为什么要用缓存？"><a href="#为什么要用-Redis-为什么要用缓存？" class="headerlink" title="为什么要用 Redis/为什么要用缓存？"></a>为什么要用 Redis/为什么要用缓存？</h4><ul><li><strong>高并发：</strong>一般像 MySQL 这类的数据库的 QPS 大概都在 1w 左右（4 核 8g） ，但是使用 Redis 缓存之后很容易达到 10w+，甚至最高能达到 30w+（就单机 redis 的情况，redis 集群的话会更高）。</li><li><strong>高性能</strong> ：假如用户第一次访问数据库中的某些数据的话，这个过程是比较慢，毕竟是从硬盘中读取的。但是，如果说，用户访问的数据属于高频数据并且不会经常改变的话，那么我们就可以很放心地将该用户访问的数据存在缓存中。<strong>这样有什么好处呢？</strong> 那就是保证用户下一次再访问这些数据的时候就可以直接从缓存中获取了。操作缓存就是直接操作内存，所以速度相当快。不过，要保持数据库和缓存中的数据的一致性。 如果数据库中的对应数据改变的之后，同步改变缓存中相应的数据即可！</li></ul></li><li><h4 id="Redis-常见数据结构以及使用场景分析"><a href="#Redis-常见数据结构以及使用场景分析" class="headerlink" title="Redis 常见数据结构以及使用场景分析"></a>Redis 常见数据结构以及使用场景分析</h4><ul><li><strong>string:</strong> 一般常用在需要计数的场景，比如用户的访问次数、热点文章的点赞转发数量等等</li><li>**list:**发布与订阅或者说消息队列、慢查询。</li><li>**hash:**系统中对象数据的存储。</li><li>**set:**需要存放的数据不能重复以及需要获取多个数据源交集和并集等场景</li><li><strong>sorted set:</strong> 需要对数据根据某个权重进行排序的场景。比如在直播系统中，实时排行信息包含直播间在线用户列表，各种礼物排行榜，弹幕消息（可以理解为按消息维度的消息排行榜）等信息。</li><li>**bitmap:**适合需要保存状态信息（比如是否签到、是否登录…）并需要进一步对这些信息进行分析的场景。比如用户签到情况、活跃用户情况、用户行为统计（比如是否点赞过某个视频）。</li></ul></li><li><h4 id="Redis有没有使用多线程？为什么不使用多线程"><a href="#Redis有没有使用多线程？为什么不使用多线程" class="headerlink" title="Redis有没有使用多线程？为什么不使用多线程"></a>Redis有没有使用多线程？为什么不使用多线程</h4><ul><li>redis是单线程模型，但是redis在4.0之后加入对多线程的支持，主要针对于大键值对的删除操作命令，使用这些命令就会使用主线程之外的其他线程进行异步处理。大体上来说，Redis 6.0 之前主要还是单线程处理。</li><li>为什么不使用多线程：<ul><li>维护困难</li><li>redis性能瓶颈不在cpu主要在内存和网络中</li><li>多线程存在死锁、线程上下文切换问题，甚至会影响性能</li></ul></li><li>Redis单线程为什么这么快<ul><li>数据存放在内存中，内存响应时间快</li><li>采用了epoll作为IO多路复用的实现，减少IO开销</li><li>单线程操作，避免线程切换和竞争锁的时间</li></ul></li></ul></li><li><h4 id="Redis给缓存数据设置过期时间作用"><a href="#Redis给缓存数据设置过期时间作用" class="headerlink" title="Redis给缓存数据设置过期时间作用"></a>Redis给缓存数据设置过期时间作用</h4><ul><li><p><strong>缓解内存的消耗：</strong>内存有限，一直保存会导致内存不足</p><pre class=" language-java"><code class="language-java">Redis 中除了字符串类型有自己独有设置过期时间的命令 `setex` 外，其他方法都需要依靠 `expire` 命令来设置过期时间 。另外， `persist` 命令可以移除一个键的过期时间</code></pre></li><li><p><strong>业务需要：</strong>如验证码五分钟有效、token一天过期</p></li></ul></li><li><p>Redis如何判断数据是否过期</p><ul><li><p>Redis通过过期词典来保存数据过期时间（可以看成一个hash表），过期词典的key指向数据库中的key，过期词典的值是一个long long类型的整数，这个值保存了key所指向的数据库键的过期时间（毫秒值）</p><pre class=" language-java"><code class="language-java">过期字典是存储在 redisDb 这个结构里的：typedef struct redisDb <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>    dict <span class="token operator">*</span>dict<span class="token punctuation">;</span>     <span class="token comment" spellcheck="true">//数据库键空间,保存着数据库中所有键值对</span>    dict <span class="token operator">*</span>expires   <span class="token comment" spellcheck="true">// 过期字典,保存着键的过期时间</span>    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span> redisDb<span class="token punctuation">;</span></code></pre></li></ul></li><li><h4 id="Redis的数据过期删除策略"><a href="#Redis的数据过期删除策略" class="headerlink" title="Redis的数据过期删除策略"></a>Redis的数据过期删除策略</h4><ul><li><p><strong>惰性</strong>删除</p><pre class=" language-markdown"><code class="language-markdown">只有在取出key的时候对数据进行过期检查（对cpu友好，但是会导致很多过期的key没有被删除）</code></pre></li><li><p><strong>定期删除</strong></p><pre class=" language-markdown"><code class="language-markdown">每隔一段时间redis就会抽取一批key进行执行过期删除。（对内存友好）</code></pre></li><li><p><strong>Redis使用的是定期删除+惰性删除。但是也会存在定期和惰性删除漏掉了很多过期key的情况，这时使用内存淘汰机制</strong></p></li></ul></li><li><h4 id="Redis内存淘汰机制（相关问题：MySQL-里有-2000w-数据，Redis-中只存-20w-的数据，如何保证-Redis-中的数据都是热点数据-）"><a href="#Redis内存淘汰机制（相关问题：MySQL-里有-2000w-数据，Redis-中只存-20w-的数据，如何保证-Redis-中的数据都是热点数据-）" class="headerlink" title="Redis内存淘汰机制（相关问题：MySQL 里有 2000w 数据，Redis 中只存 20w 的数据，如何保证 Redis 中的数据都是热点数据?）"></a>Redis内存淘汰机制（相关问题：MySQL 里有 2000w 数据，Redis 中只存 20w 的数据，如何保证 Redis 中的数据都是热点数据?）</h4><p><strong>Redis六种内存淘汰机制：</strong></p><pre class=" language-java"><code class="language-java"><span class="token number">1</span><span class="token punctuation">.</span><span class="token keyword">volatile</span><span class="token operator">-</span>lru（least recently used）：从已设置过期时间的数据集（server<span class="token punctuation">.</span>db<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>expires）中挑选最近最少使用的数据淘汰<span class="token number">2</span><span class="token punctuation">.</span><span class="token keyword">volatile</span><span class="token operator">-</span>ttl：从已设置过期时间的数据集（server<span class="token punctuation">.</span>db<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>expires）中挑选将要过期的数据淘汰<span class="token number">3</span><span class="token punctuation">.</span><span class="token keyword">volatile</span><span class="token operator">-</span>random：从已设置过期时间的数据集（server<span class="token punctuation">.</span>db<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>expires）中任意选择数据淘汰<span class="token number">4</span><span class="token punctuation">.</span>allkeys<span class="token operator">-</span>lru（least recently used）：当内存不足以容纳新写入数据时，在键空间中，移除最近最少使用的 key（这个是最常用的）<span class="token number">5</span><span class="token punctuation">.</span>allkeys<span class="token operator">-</span>random：从数据集（server<span class="token punctuation">.</span>db<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>dict）中任意选择数据淘汰<span class="token number">6</span><span class="token punctuation">.</span>no<span class="token operator">-</span>eviction：禁止驱逐数据，也就是说当内存不足以容纳新写入数据时，新写入操作会报错。这个应该没人使用吧！redis4<span class="token number">.0</span>后新增两种<span class="token number">7</span><span class="token punctuation">.</span><span class="token keyword">volatile</span><span class="token operator">-</span>lfu（least frequently used）：从已设置过期时间的数据集<span class="token punctuation">(</span>server<span class="token punctuation">.</span>db<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>expires<span class="token punctuation">)</span>中挑选最不经常使用的数据淘汰<span class="token number">8</span><span class="token punctuation">.</span>allkeys<span class="token operator">-</span>lfu（least frequently used）：当内存不足以容纳新写入数据时，在键空间中，移除最不经常使用的 key</code></pre></li><li><h4 id="Redis持久化"><a href="#Redis持久化" class="headerlink" title="Redis持久化"></a>Redis持久化</h4><p><strong>Redis支持两种持久化方式：快照（RDB）和只追加文件（AOF）</strong></p><ul><li><p>​    快照持久化（RDB）：是redis默认使用的持久化方式，使用场景：</p><ul><li>主从全量同步数据</li><li>数据库备份</li><li>对于丢失数据不敏感的业务场景，实例宕机后快速恢复数据</li></ul><pre class=" language-java"><code class="language-java">redis通过创建快照获取存储在数据库中的某个时间节点的数据。创建快照后可以进行备份，可以将快照复制到其他数据库，从而创建具有相同数据的服务器副本（redis主从结构，用来提升redis性能），还可以存在本地，方便重启后进行恢复快照持久化是 Redis 默认采用的持久化方式，在 Redis<span class="token punctuation">.</span>conf 配置文件中默认有此下配置：save <span class="token number">900</span> <span class="token number">1</span>           #在<span class="token number">900</span>秒<span class="token punctuation">(</span><span class="token number">15</span>分钟<span class="token punctuation">)</span>之后，如果至少有<span class="token number">1</span>个key发生变化，Redis就会自动触发BGSAVE命令创建快照。save <span class="token number">300</span> <span class="token number">10</span>          #在<span class="token number">300</span>秒<span class="token punctuation">(</span><span class="token number">5</span>分钟<span class="token punctuation">)</span>之后，如果至少有<span class="token number">10</span>个key发生变化，Redis就会自动触发BGSAVE命令创建快照。save <span class="token number">60</span> <span class="token number">10000</span>        #在<span class="token number">60</span>秒<span class="token punctuation">(</span><span class="token number">1</span>分钟<span class="token punctuation">)</span>之后，如果至少有<span class="token number">10000</span>个key发生变化，Redis就会自动触发BGSAVE命令创建快照。</code></pre></li><li><p>AOF持久化：与RDB相比，AOF实时性更好，是主流的持久化方案</p><ul><li><p>开启AOF持久化：</p><pre class=" language-java"><code class="language-java">在redis<span class="token punctuation">.</span>conf 加入语句：appendonly yes 开启AOF</code></pre><p>开启AOF持久化，每执行一条修改数据库的指令，redis都会将该命令写入到硬盘中的AOF文件。默认文件名是appendonly.aof</p><p>在 Redis 的配置文件中存在三种不同的 AOF 持久化方式（刷盘方式），它们分别是：</p><pre class=" language-java"><code class="language-java">appendsync always     #每次有数据修改都会记录到aof文件中，会降低redis速度appendsync everysec        #每一秒种同步一次，将命令写入到硬盘（最多丢失一秒钟的数据）appendonly no                    #让操作系统决定什么时候进行同步</code></pre></li></ul></li><li><p>AOF优势：</p><ul><li>AOF数据文件更新比较及时，比RDB保存更完整的数据，这样在数据恢复时能够恢复尽量完整的数据，降低丢失数据的风险。</li></ul></li><li><p>AOF缺点：</p><ul><li>随着时间增长，AOF文件越来越大</li><li>AOF文件刷盘增加磁盘IO负担，从而影响redis性能（开启everysec时）</li></ul></li></ul></li><li><h4 id="Redis事务问题"><a href="#Redis事务问题" class="headerlink" title="Redis事务问题"></a>Redis事务问题</h4><ul><li>Redis 可以通过 <strong><code>MULTI</code>，<code>EXEC</code>，<code>DISCARD</code> 和 <code>WATCH</code></strong> 等命令来实现事务(transaction)功能。</li><li>注意：redis事务和mysql事务不一样，redis事务不支持回滚（roll back），因此不满足事务四要素的原子性，同时也不满足持久性</li></ul></li><li><h4 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h4><ul><li><p>缓存穿透就是大量请求的key不存在与缓存中，导致请求直接访问数据库，没有经过缓存。</p><p><a href="https://imgtu.com/i/RnEI4s"><img src="https://z3.ax1x.com/2021/06/23/RnEI4s.png" alt="RnEI4s.png"></a></p><p><strong>解决方案：</strong></p><ol><li><p>缓存无效的key：如果缓存和数据库都查不到某个key的数据，那么就在redis中创建这个key，并设置过期时间，具体命令：<code>set key value ex 10086 </code>,这样可以解决key变化不频繁的情况，但是如果有大量不同的key，那么就会导致redis中存储大量无效的key（可以将key的过期时间修改的短一些如一分钟）</p></li><li><p>布隆过滤器</p><ul><li><p>布隆过滤器：可以判断一个给定数据是否存在于大量数据中。具体操作：将所有可能访问的key都存放在布隆过滤器中，当请求过来，先判断访问的数据在布隆过滤器中是否存在。不存在直接返回请求数据错误，存在的话接着向下走，流程如下：</p><p><a href="https://imgtu.com/i/RnZVyV"><img src="https://z3.ax1x.com/2021/06/23/RnZVyV.png" alt="RnZVyV.png"></a></p><p><strong>注意：</strong>布隆过滤器会存在误判情况。布隆过滤器说某个元素存在，小概率会误判。布隆过滤器说某个元素不存在，那么它一定不存在。</p></li></ul></li></ol></li></ul></li><li><h4 id="缓存雪崩"><a href="#缓存雪崩" class="headerlink" title="缓存雪崩"></a>缓存雪崩</h4><ul><li><strong>什么是缓存雪崩：</strong>缓存在同一时间大面积失效，后面的请求直接落到数据库上，导致数据库在短时间内承受大量请求。例如：<ul><li>缓存服务器宕机不可用</li><li>热点数据在某一时刻大面积失效，如秒杀开始前12小时统一存放商品到redis中，设置缓存时间也是12小时，那么当开始秒杀的时候这些数据都已经失效不能访问了，导致这些请求直接落到数据库中。</li></ul></li><li><strong>解决方案：</strong><ul><li>针对redis服务不可用：<ol><li>使用redis集群，避免单机故障导致整个缓存服务器不可用</li><li>限流，避免大量请求</li></ol></li><li>针对热点缓存失效<ol><li>设置不同的生效时间，如随机设置缓存失效时间</li><li>永久不失效</li></ol></li></ul></li></ul></li><li><h4 id="如何保证缓存和数据库数据一致性"><a href="#如何保证缓存和数据库数据一致性" class="headerlink" title="如何保证缓存和数据库数据一致性"></a>如何保证缓存和数据库数据一致性</h4><ol><li><p><strong>懒加载模式</strong>，流程如下：</p><p><a href="https://imgtu.com/i/RnupXq"><img src="https://z3.ax1x.com/2021/06/23/RnupXq.jpg" alt="RnupXq.jpg"></a></p><p>保证一致性：延迟双删</p><ul><li>方案一：先删除缓存，再更新数据库，休眠500毫秒，再次删除缓存。休眠时间应该根据项目读数据业务逻辑的耗时时间来定，这么做目的其实确保读请求结束，写请求可以删除读请求造成的缓存脏数据</li><li>方案二：先删除缓存，再更新数据库，触发异步写入串行化mq。mq接收再次删除缓存</li></ul><p>双删失败如何处理：</p><ul><li>设置缓存过期时间：最差的情况就是在超时时间内数据存在不一致。</li><li>失败重试，流程如下<ol><li>更新数据库数据</li><li>数据库会将操作信息写入到binlog日志</li><li>订阅程序提取出所需要的数据以及key</li><li>另起一段业务，获取这些信息</li><li>尝试删除缓存，发现删除失败</li><li>将删除失败的信息发送到消息队列</li><li>消费消息队列中的数据再次进行删除缓存</li></ol></li></ul></li><li><p><strong>旁路缓存模式</strong></p><ol><li>更新 数据库，然后直接删除 缓存 。</li><li>如果更新数据库成功，删除缓存失败<ul><li>缓存时间变短（不推荐）、</li><li>增加缓存更新重试机制（常用）：如何缓存服务当前不可用导致缓存删除失败，就隔一段时间重试，重试次数自己指定。如果重试依旧失败，可以将失败的key存入到队列中，等缓存服务可用后，再将缓存中对应的key删除</li></ul></li></ol></li></ol></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 数据库 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Redis </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>
